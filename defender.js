@@ -12,6 +12,14 @@ function preload () {
 //I'm adding new functionality
 //new feature
 //commit test
+class Ufo{
+    constructor(startHealth, power){
+        this.startHealth = startHealth
+        this.power = power
+    }
+}
+
+var myUfo = new Ufo(100, 50);
 
 var stars;
 var baddies;
