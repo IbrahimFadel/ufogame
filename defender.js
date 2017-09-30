@@ -19,6 +19,7 @@ class Ufo{
     }
 }
 
+// hello
 var myUfo = new Ufo(100, 50);
 
 var stars;
