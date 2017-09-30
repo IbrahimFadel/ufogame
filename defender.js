@@ -9,6 +9,10 @@ function preload () {
 
 }
 
+//I'm adding new functionality
+//new feature
+//commit test
+
 var stars;
 var baddies;
 var lazers;
