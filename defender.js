@@ -6,21 +6,8 @@ function preload () {
     game.load.image('star', 'assets/demoscene/star2.png');
     game.load.image('baddie', 'assets/sprites/space-baddie.png');
     game.load.atlas('lazer', 'assets/games/defender/laser.png', 'assets/games/defender/laser.json');
-
+    game.load.spritesheet('kaboom', 'assets/games/invaders/explode.png', 128, 128);
 }
-
-//I'm adding new functionality
-//new feature
-//commit test
-class Ufo{
-    constructor(startHealth, power){
-        this.startHealth = startHealth
-        this.power = power
-    }
-}
-
-// hello
-var myUfo = new Ufo(100, 50);
 
 var stars;
 var baddies;
@@ -29,12 +16,18 @@ var player;
 var cursors;
 var fireButton;
 var bulletTime = 0;
-var frameTime = 0;
 var frames;
 var prevCamX = 0;
+var score = 0;
+var fuelAmount = 200;
+var explosion;
+var hasBeenCalled = false;
 
 function create () {
 
+    game.world.setBounds(0, 0, 800, 600);
+
+    game.physics.startSystem(Phaser.Physics.ARCADE);
     game.world.setBounds(0, 0, 800*4, 600);
 
     frames = Phaser.Animation.generateFrameNames('frame', 2, 30, '', 2);
@@ -42,22 +35,32 @@ function create () {
 
     stars = game.add.group();
 
-    for (var i = 0; i < 128; i++)
+    for (let i = 0; i < 128; i++)
     {
         stars.create(game.world.randomX, game.world.randomY, 'star');
     }
 
     baddies = game.add.group();
+    baddies.enableBody = true;
+    baddies.physicsBodyType = Phaser.Physics.ARCADE;
 
-    for (var i = 0; i < 16; i++)
+    for (let i = 0; i < 16; i++)
     {
         baddies.create(game.world.randomX, game.world.randomY, 'baddie');
     }
 
     lazers = game.add.group();
+    lazers.enableBody = true;
+    lazers.physicsBodyType = Phaser.Physics.ARCADE;
 
     player = game.add.sprite(100, 300, 'player');
+    game.physics.arcade.enable(player);
     player.anchor.x = 0.5;
+    player.body.collideWorldBounds = true;
+
+    player.animations.add('kaboom');
+    explosion = game.add.sprite(-100,-100, 'kaboom');
+    explosion.animations.add('explode');
 
     game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.1);
 
@@ -65,35 +68,71 @@ function create () {
     fireButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
     prevCamX = game.camera.x;
-
 }
 
 function update () {
+    game.physics.arcade.overlap(lazers, baddies, function(lazer,baddie){
+        baddie.kill();
+        score++
+        console.log("A baddie was hit!")
+    }, null, this);
 
-    if (cursors.left.isDown)
-    {
-        player.x -= 8;
-        player.scale.x = -1;
-    }
-    else if (cursors.right.isDown)
-    {
-        player.x += 8;
-        player.scale.x = 1;
+    game.physics.arcade.overlap(player, baddies, function(player, baddie){
+        console.log("Whoops! watch where ur goin")
+    }, null, this);
+
+
+    var graphics = game.add.graphics(100, 100);
+    graphics.fixedToCamera = true;
+    graphics.beginFill(0xFFFFFF);
+
+
+    graphics.clear();
+    graphics.endFill();
+    graphics.lineStyle(2, 0x0000FF, 1);
+    graphics.drawRect( 50, 10, 200, 100);
+    graphics.beginFill(0xFFFFFF);
+    graphics.drawRect( 50, 10, fuelAmount, 100);
+
+
+    if(fuelAmount <= 0 && hasBeenCalled == false) {
+        explosion.reset(player.x - 70, player.y - 50);
+        explosion.animations.play('explode', 30, false, true);
+        hasBeenCalled = true
     }
 
-    if (cursors.up.isDown)
-    {
-        player.y -= 8;
-    }
-    else if (cursors.down.isDown)
-    {
-        player.y += 8;
+    if(fuelAmount > 0) {
+        if(cursors.left.isDown || cursors.right.isDown || cursors.up.isDown || cursors.down.isDown ) {
+            fuelAmount = fuelAmount - 0.5
+        }
+        if(cursors.left.isDown)
+        {
+            player.x -= 8;
+            player.scale.x = -1;
+        }
+        else if(cursors.right.isDown)
+        {
+            player.x += 8;
+            player.scale.x = 1;
+        }
+
+        if(cursors.up.isDown)
+        {
+            player.y -= 8;
+        }
+        else if(cursors.down.isDown)
+        {
+            player.y += 8;
+        }
+
+        if(fireButton.isDown)
+        {
+            fireBullet();
+        }
     }
 
-    if (fireButton.isDown)
-    {
-        fireBullet();
-    }
+
+
 
     lazers.forEachAlive(updateBullets, this);
 
