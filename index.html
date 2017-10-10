@@ -4,7 +4,68 @@
 
 <body>
     <div id="phaser-example"> </div>
-<script src="/phaser.js"></script>
-<script src="/defender.js"></script>
+
+
+
+
+<h1>Games!!!!</h1>
+<p>Click on a game below to play!</p>
+
+
+<!--<img src="assets/ufoGamePNG.png">!-->
+
+    <input type="checkbox" id="btnControl"/>
+    <label class="btn" for="btnControl"><img src="assets/ufoGamePNG.png" id="btnLeft" /></label>
+
+<style>
+
+ img {
+    width: 300px;
+    height: 200px;
+     border-radius: 10%;
+     position: absolute;
+     left: 50px;
+     top: 250px;
+}
+
+ img:hover {
+     width: 310px;
+     height: 210px;
+     border-radius: 10%;
+     position: absolute;
+     left: 50px;
+     top: 250px;
+ }
+
+ #btnControl {
+     display: none;
+ }
+
+ #btnControl:checked + label > img {
+     width: 310px;
+     height: 210px;
+     border-radius: 10%;
+     position: absolute;
+     left: 50px;
+     top: 250px;
+     window.open(localhost:8080);
+ }
+
+ h1 {
+     position: absolute;
+     left: 850px;
+ }
+
+ p {
+     position: absolute;
+     left: 820px;
+     top: 70px;
+ }
+
+
+</style>
+
+    <!--<script src="/phaser.js"></script>
+    <script src="/defender.js"></script> !-->
 </body>
 </html>
