@@ -161,6 +161,9 @@ function update () {
             graphics.beginFill(0xFFFFFF);
 
 
+
+
+
             graphics.clear();
             graphics.endFill();
             graphics.lineStyle(2, 0x0000FF, 1);
