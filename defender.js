@@ -2,8 +2,7 @@ var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { preload:
 
 function preload () {
 
-    game.load.image('specialForces', 'assets/sprites/ufo.png');
-    game.load.image('newPlayer', 'assets/sprites/player.png');
+    game.load.image('newPlayer', 'assets/sprites/ufo.png');
     game.load.image('star', 'assets/demoscene/star2.png');
     game.load.image('baddie', 'assets/sprites/space-baddie.png');
     game.load.image('fuelTank', 'assets/sprites/orb-red.png');
@@ -12,7 +11,7 @@ function preload () {
     game.load.bitmapFont('stack', 'assets/demoscene/shortStack.png', 'assets/demoscene/shortStack.xml');
     game.load.image('bullet', 'assets/games/defender/bullet170.png');
     game.load.image('platform', 'assets/sprites/platform.png');
-    game.load.image('guard', 'assets/sprites/shmup-ship.png');
+    game.load.image('boss', 'assets/sprites/shmup-ship.png');
 }
 
 var stars;
@@ -103,6 +102,54 @@ class ChaserBaddie {
     }
 }
 
+class Boss {
+    constructor(game, x, y, name){
+        this.boss = game.add.sprite(x, y, 'boss');
+        game.physics.arcade.enable(this.boss);
+        this.collideTrueFalse = false;
+    }
+
+    makeChaseAfter(sprite){
+        this._chaseAfter = sprite;
+    }
+
+    startUpdating(){
+        var self = this;
+        setInterval(function(){
+            self.update();
+        }, 20);
+    }
+
+    update() {
+
+        var player = this._chaseAfter;
+        var boss = this.boss;
+        var xdiff = player.x - boss.x;
+
+        var ydiff = player.y - boss.y;
+
+        if (xdiff > 0) {
+            boss.body.velocity.x = 50;
+            //baddie.scale.x = 1;
+        } else if (xdiff < 0) {
+            boss.body.velocity.x = -50;
+            //player.scale.x = -1;
+        } else {
+            boss.body.velocity.x = 0;
+        }
+        if (ydiff > 0) {
+            boss.body.velocity.y = 50;
+            //baddie.scale.x = 1;
+        } else if (ydiff < 0) {
+            boss.body.velocity.y = -50;
+            //baddie.scale.x = -1;
+        } else {
+            boss.body.velocity.y = 0;
+        }
+    }
+
+}
+
 function create () {
 
 
@@ -152,13 +199,19 @@ function create () {
     player.body.bounce.y = 0.2;
     player.body.bounce.x = 0.2;
     player.body.gravity.y = 100;
-    player.scale.setTo(1.5, 1.8);
     player.animations.add('kaboom');
 
     for(let i = 0; i < 5; i++) {
         explosion[i] = game.add.sprite(-100,-100, 'kaboom');
         explosion[i].animations.add('explode');
     }
+
+    var boss = new Boss(game, 200, 200);
+
+    boss.makeChaseAfter(player);
+
+    boss.startUpdating();
+
 
     var chaserBaddie = new ChaserBaddie(game, 400, 200,  "bob");
     var chaserBaddie1 = new ChaserBaddie(game, 400, 200, "james");
@@ -180,6 +233,7 @@ function create () {
 
     //For debugging purposes only
     window.chaserBaddie = chaserBaddie;
+    window.boss = boss;
 
     chaserBaddie.startUpdating();
     chaserBaddie1.startUpdating();
@@ -188,11 +242,6 @@ function create () {
     chaserBaddie4.startUpdating();
     chaserBaddie5.startUpdating();
     chaserBaddie6.startUpdating();
-
-
-
-    game.add.sprite(200, 200, 'specialForces');
-    game.add.sprite(375, 400, 'guard');
 
 
     game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.1);
